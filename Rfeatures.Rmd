@@ -15,7 +15,7 @@ Because there are so many kinds of graphs and charts you can do in R and also be
 
 To see visually how Facebook’s stock price correlates with Twitter’s stock price, you can plot them against one another with the plot() function. That gives you the below scatter plot. You get the line from adding the abline() function after the plot has been created.
 
-![Facebook and Twitter stock price.](U:\Desktop\IMG_4875.jpg)
+![Facebook and Twitter stock price.](http://www.douglaserice.com/wp-content/uploads/2015/10/IMG_4875.jpg)
 
 ## References
 
