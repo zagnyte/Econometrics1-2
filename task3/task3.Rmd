@@ -1,0 +1,91 @@
+---
+title: "task3.Rmd"
+author: "Simona Gritytė"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Building a word cloud in R
+
+A cool thing that R can do is text analysis. The “tm” package includes all sorts of capabilities for analyzing text. What I am going to show in this article is how to use R to discover the most frequent words that occur in a text and build a word cloud with them.
+
+And why would anyone want to do this? Well, maybe you’re a writer and you want to see which words you’re overusing. Maybe you’re reading reviews on a product and you want to see what words people are using to describe it. Maybe you want to see what’s trending on a popular news site. The possibilities are endless. So, let’s analyze an example.
+
+The data that I will be using is a sample of 1000 reviews of popular free-to-play games from the iTunes store. You can download the data [here](http://www.deltadna.com/wp-content/uploads/2015/04/Reviews.csv).
+
+Firstly, we need to install the "tm" and "wordcloud" libraries that we will be using for our text analysis and set our working directory to where we saved our CSV file.
+
+```{r, include=FALSE}
+library('tm')
+library('wordcloud')
+library('RColorBrewer')
+setwd('D://Econometrics1/task3')
+```
+
+Then we are going to load the csv file containing our data and apply some changes to it so that we can do our further analysis and count the frequency of the words used in the reviews.
+
+```{r}
+reviews <- read.csv ("reviews.csv", stringsAsFactors=FALSE)
+
+#we want to paste all the reviews into one text
+
+review_text <- paste(reviews$text, collapse=" ")
+
+#then we can set up the source and create a corpus
+
+review_source <- VectorSource(review_text)
+corpus <- Corpus(review_source)
+
+#next, we begin cleaning the text
+
+corpus <- tm_map(corpus, content_transformer(tolower))
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus, removeWords, stopwords('english'))
+```
+
+What we did here, is  that We’ve transformed every word to lower case, so that ‘Fun’ and ‘fun’ now count as the same word and we’ve removed all punctuation – ‘fun’ and ‘fun!’ will now be the same. We stripped out any extra whitespace and we removed stop words, which are just common words that we are not interested in.
+
+```{r}
+#now we create the document-term matrix
+
+dtm <- DocumentTermMatrix(corpus)
+
+#and convert it into a normal matrix, which is easier to work with
+
+dtm2 <- as.matrix(dtm)
+
+#we then take the column sums of this matrix, which will give us a named vector
+#and we can sort this vector to see the most frequently used words:
+
+frequency <- colSums(dtm2)
+frequency <- sort(frequency, decreasing=TRUE)
+head(frequency)
+```
+
+## Plotting a word cloud
+
+However, a list of words and frequencies is a little hard to interpret. Let’s visualize these words as a word cloud using the wordcloud package.
+
+Word cloud is very easy to use, we just need a list of the words to be plotted and their frequency. To get the list of words we can take the names of our named vector.
+
+```{r}
+words <- names(frequency)
+```
+
+Let’s plot the top 100 words in our cloud.
+
+```{r}
+wordcloud(words[1:100], frequency[1:100])
+```
+
+Now, I’m sure this is far from the prettiest word cloud you’ve ever seen. But I hope it inspires you to try a piece of text analysis.
+
+## References
+
+[4 Useful Things To Do With R Programming](http://www.douglaserice.com/r-programming/)
+
+[Text Mining in R Tutorial](https://deltadna.com/blog/text-mining-in-r-for-term-frequency/)
