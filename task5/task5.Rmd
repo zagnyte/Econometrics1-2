@@ -47,7 +47,7 @@ plot(table(S)/n, xlab="Suma", ylab="Tikimybė")
 points(S_teor, col=2)
 ```
 
-Raudona linija žymi teorines tikimybes.
+Raudoni taškai žymi teorines tikimybes.
 
 4. Suskaičiuokite teorinį S vidurkį ir dispersiją. Padarykite grafikus, kuriuose matytųsi, kaip didėjant n minėtų charakteristikų įvertiniai artėja į teorines reikšmes.
 
