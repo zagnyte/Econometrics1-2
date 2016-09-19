@@ -1,0 +1,79 @@
+---
+title: "Task 5"
+author: "Simona Gritytė, Orinta Jautakaitė, Sandra Kozlovskaja, Agnė Zavackaitė"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library('prob')
+```
+
+## Random variable challenge
+
+Tarkime, kad ridenami trys taisyklingi standartiniai lošimo kauliukai. Fiksuojama iškritusių akučių suma, pažymėkime šį atsitiktinį dydį S.
+
+1. Atlikite Monte-Carlo modeliavimą sugeneruodami S atsitiktinio dydžio nepriklausomas realizacijas S1, S2, …, Sn. Čia n=10^5.
+
+```{r}
+n <- 10^5
+S <- replicate(n, sum(sample(1:6, 3, replace = TRUE)))
+head(S, 15)
+```
+
+Aukščiau pateikta 15 pirmų atsitiktinio dydžio S realizacijų.
+
+2. Raskite teorinį S skirstinį, t.y. kiekvienai galimai S reikšmei raskite pasirodymo tikimybę.
+
+```{r}
+St <- rolldie(3, nsides = 6, makespace = TRUE)
+St <- addrv(St, sum = X1 + X2 + X3)
+S_teor <- marginal(St, vars="sum")
+S_teor
+```
+
+Šio kodo pavyzdį radome knygoje Kerns, G. Jay. 2011. “Introduction to Probability and Statistics Using R.”.
+
+3. Iš sugeneruotos imties, padarykite santykinių dažnių lentelę ir gautas reikšmes palyginkite su teorinėmis tikimybėmis. Palyginimui pateikite grafiką ir lentelę, taip, kad būtų patogu lyginti gautus rezultatus.
+
+```{r}
+cbind(as.data.frame(table(S)/n), S_teor)
+```
+
+Teorinės tikimybės pateiktos dešinėje.
+
+```{r}
+plot(table(S)/n, xlab="Suma", ylab="Tikimybė")
+points(S_teor, col=2)
+```
+
+Raudona linija žymi teorines tikimybes.
+
+4. Suskaičiuokite teorinį S vidurkį ir dispersiją. Padarykite grafikus, kuriuose matytųsi, kaip didėjant n minėtų charakteristikų įvertiniai artėja į teorines reikšmes.
+
+Teorinis vidurkis:
+
+```{r}
+ES <- sum(S_teor$probs * S_teor$sum)
+ES
+```
+
+Teorinė dispersija:
+
+```{r}
+varS <- sum(S_teor$probs * (S_teor$sum-ES)^2)
+varS
+```
+
+```{r}
+plot(cumsum(S)/1:n, type="l", xlab="n", ylab = "S / n", main="Vidurkio artėjimas į teorinį")
+abline(h=ES, col=2)
+
+a=S*0
+for(i in 1:10000){
+  a[i]=var(S[1:i])
+}
+
+plot(a[1:10000], type="l", xlab="n", ylab="varS", main="Dispersijos artėjimas į teorinę")
+abline(h=varS, col=2)
+```
