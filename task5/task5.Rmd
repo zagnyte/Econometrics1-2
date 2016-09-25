@@ -69,11 +69,11 @@ varS
 plot(cumsum(S)/1:n, type="l", xlab="n", ylab = "S / n", main="Vidurkio artėjimas į teorinį")
 abline(h=ES, col=2)
 
-a=S*0
+a = rep(0, n/10)
 for(i in 1:10000){
-  a[i]=var(S[1:i])
+  a[i]=var(S[1:(i*10)])
 }
 
-plot(a[1:10000], type="l", xlab="n", ylab="varS", main="Dispersijos artėjimas į teorinę")
+plot(((1:10000)*10), a, type="l", xlab="n", ylab="varS", main="Dispersijos artėjimas į teorinę")
 abline(h=varS, col=2)
 ```
