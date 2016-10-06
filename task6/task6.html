@@ -327,20 +327,6 @@ head(sort(table(df2$lesson_name), decreasing=TRUE))</code></pre>
 ##                      129                      106                       98</code></pre>
 <p>Galima teigti, jog sunkiausios pamokos buvo <strong>“Functions”</strong> ir <strong>“Workspace and Files”</strong>.</p>
 </div>
-<div id="kurie-studentai-uzduotis-dare-naktimis" class="section level4">
-<h4>Kurie studentai užduotis darė naktimis?</h4>
-<p>Surandam studentus, kurie užduotis darė tarp 12 valandos vakaro ir 6 valandos ryto.</p>
-<pre class="r"><code>df_time &lt;- df[,c(3, 6, 7, 9, 13)]
-df2 &lt;- df[,c(7,9)]
-dup &lt;- which(duplicated(df2), TRUE)
-df_time &lt;- df_time[-dup,]
-time &lt;- times(format(df_time$datetime, &quot;%H:%M:%S&quot;))
-ind &lt;- with(df_time, which(hours(time)&lt;6))
-df_time &lt;- df_time[ind,]
-unique(df_time$user)</code></pre>
-<pre><code>## [1] &quot;Karolina&quot;          &quot;Domante Bulovaite&quot; &quot;Greta&quot;            
-## [4] &quot;Raigardas&quot;         &quot;Dariukxas&quot;         &quot;simonalevickaite&quot;</code></pre>
-</div>
 </div>
 </div>
 
