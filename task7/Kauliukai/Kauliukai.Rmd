@@ -33,7 +33,9 @@ while (i<n+1) {
     laim_1[i] <- 0
     i = i+1
   }
-  else i = i
+  else {
+    i = i
+  }
 }
 
 mean(laim_1)

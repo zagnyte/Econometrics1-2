@@ -1,0 +1,43 @@
+---
+title: "Task 7"
+author: "Simona Gritytė"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Rulete
+
+Nagrinėkime standartinę kazino ruletę.
+
+Kokia tikimybė, kad po 1000 vienodų statymų ant vienos pasirinktos spalvos, bus teigiamas balansas?
+
+```{r}
+n <- 100000
+
+bal <- c(rep(0, times=n))
+teig_bal <- c(rep(0, times=n))
+
+for (i in 1:n) {
+  bal[i] <- sum(sample(c(1,-1), size=1000, replace=TRUE, prob=c(18/37, 19/37)))
+  if (bal[i] > 0) {
+    teig_bal[i] <- 1
+  }
+  else {
+    teig_bal[i] <- 0
+  }
+}
+
+mean(teig_bal)
+```
+
+Raskite apytikslę x reikšmę, kuriai galioja nelygybė P(balansas<x)=0.25.
+
+```{r}
+x <- quantile(bal, probs=0.25)
+x
+```
+
+Taigi, apytikslė x reikšmė yra -48.

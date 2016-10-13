@@ -1,0 +1,25 @@
+---
+title: "Task 7"
+author: "Simona Gritytė"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## CRT
+
+Generuojame n atsitiktinių dydžių turinčių Beta skirstinį su parametrais α=β=0.5. Iš šių atsitiktinių dydžių suskaičiuojamas aritmetinis vidurkis.
+
+Kaip atrodo aritmetinio vidurkio tankis, kai n=100?
+
+```{r}
+n <- 100
+m <- 100000
+
+vid <- replicate(m, mean(rbeta(n, 0.5, 0.5)))
+
+plot(density(vid), main="Aritmetinio vidurkio tankis")
+```
+
