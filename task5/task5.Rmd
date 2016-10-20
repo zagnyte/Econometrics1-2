@@ -13,7 +13,7 @@ library('prob')
 
 Tarkime, kad ridenami trys taisyklingi standartiniai lošimo kauliukai. Fiksuojama iškritusių akučių suma, pažymėkime šį atsitiktinį dydį S.
 
-1. Atlikite Monte-Carlo modeliavimą sugeneruodami S atsitiktinio dydžio nepriklausomas realizacijas S1, S2, …, Sn. Čia n=10^5.
+**1. Atlikite Monte-Carlo modeliavimą sugeneruodami S atsitiktinio dydžio nepriklausomas realizacijas S1, S2, …, Sn. Čia n=10^5.**
 
 ```{r}
 n <- 10^5
@@ -23,21 +23,26 @@ head(S, 15)
 
 Aukščiau pateikta 15 pirmų atsitiktinio dydžio S realizacijų.
 
-2. Raskite teorinį S skirstinį, t.y. kiekvienai galimai S reikšmei raskite pasirodymo tikimybę.
+**2. Raskite teorinį S skirstinį, t.y. kiekvienai galimai S reikšmei raskite pasirodymo tikimybę.**
+
+Šio kodo pavyzdį radome knygoje Kerns, G. Jay. 2011. “Introduction to Probability and Statistics Using R.”.
+
+Šiame kode naudojamos funkcijos iš paketo **"prob"**.
 
 ```{r}
+#surandame visas 3 kauliukų ridenimo eksperimento galimas baigtis ir jų teorines tikimybes
 St <- rolldie(3, nsides = 6, makespace = TRUE)
+#prijungiame stulpelį su iškritusių akučių sumomis
 St <- addrv(St, sum = X1 + X2 + X3)
+#randame visų galimų iškritusių akučių sumų teorines tikimybes
 S_teor <- marginal(St, vars="sum")
 S_teor
 ```
 
-Šio kodo pavyzdį radome knygoje Kerns, G. Jay. 2011. “Introduction to Probability and Statistics Using R.”.
-
-3. Iš sugeneruotos imties, padarykite santykinių dažnių lentelę ir gautas reikšmes palyginkite su teorinėmis tikimybėmis. Palyginimui pateikite grafiką ir lentelę, taip, kad būtų patogu lyginti gautus rezultatus.
+**3. Iš sugeneruotos imties, padarykite santykinių dažnių lentelę ir gautas reikšmes palyginkite su teorinėmis tikimybėmis. Palyginimui pateikite grafiką ir lentelę, taip, kad būtų patogu lyginti gautus rezultatus.**
 
 ```{r}
-cbind(as.data.frame(table(S)/n), S_teor)
+cbind(as.data.frame(table(S)/n), S_teor$probs)
 ```
 
 Teorinės tikimybės pateiktos dešinėje.
@@ -49,7 +54,7 @@ points(S_teor, col=2)
 
 Raudoni taškai žymi teorines tikimybes.
 
-4. Suskaičiuokite teorinį S vidurkį ir dispersiją. Padarykite grafikus, kuriuose matytųsi, kaip didėjant n minėtų charakteristikų įvertiniai artėja į teorines reikšmes.
+**4. Suskaičiuokite teorinį S vidurkį ir dispersiją. Padarykite grafikus, kuriuose matytųsi, kaip didėjant n minėtų charakteristikų įvertiniai artėja į teorines reikšmes.**
 
 Teorinis vidurkis:
 
@@ -69,6 +74,8 @@ varS
 plot(cumsum(S)/1:n, type="l", xlab="n", ylab = "S / n", main="Vidurkio artėjimas į teorinį")
 abline(h=ES, col=2)
 
+#suskaičiuojame kaip keitėsi empirinė dispersija didėjant n
+#skaičiuojame tik kas dešimtame taške, nes tai neturi didelės įtakos tikslumui, bet skaičiavimai užtrunka trumpiau nei skaičiuojant dispersiją kiekviename taške
 a = rep(0, n/10)
 for(i in 1:10000){
   a[i]=var(S[1:(i*10)])

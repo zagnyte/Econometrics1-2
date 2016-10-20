@@ -151,6 +151,7 @@ sapply(df, class)</code></pre>
 ## [25] &quot;Juste&quot;             &quot;juste&quot;             &quot;Dariukxas&quot;        
 ## [28] &quot;ju&quot;                &quot;simonalevickaite&quot;  &quot;j&quot;                
 ## [31] &quot;Danielius&quot;</code></pre>
+<p>Taigi, surandame eilutes, kuriose stulpelyje “user” yra šie vardai ir jas pašaliname.</p>
 <pre class="r"><code>ind &lt;- with(df, which(user==&quot;aaa&quot; | user==&quot;testas&quot; | user==&quot;1vbutkus&quot;))
 df &lt;- df[-ind,]
 unique(df$user)</code></pre>
@@ -177,7 +178,8 @@ unique(df$user)</code></pre>
 ## [16] &quot;Domante Bulovaite&quot; &quot;Raigardas&quot;         &quot;Greta&quot;            
 ## [19] &quot;gretajes&quot;          &quot;juste&quot;             &quot;Dariukxas&quot;        
 ## [22] &quot;simonalevickaite&quot;  &quot;Danielius&quot;</code></pre>
-<p>Dabar, kai besidubliuojančių vartotojų nebėra, patikriname, ar nėra pakartotinai to paties vartotojo suvestų pamokų ir pašaliname besidubliuojančias eilutes. Tam reikia tikrinti tik stulpelius su vartotojo vardu, pamokos pavadinimu, klausimo numeriu, bandymo numeriu ir “skipped” reikšme.</p>
+<p>Dabar, kai besidubliuojančių vartotojų nebėra, patikriname, ar nėra pakartotinai to paties vartotojo suvestų pamokų ir pašaliname besidubliuojančias eilutes. Tam reikia tikrinti tik stulpelius su vartotojo vardu (7), pamokos pavadinimu (9), klausimo numeriu (10), bandymo numeriu (12) ir “skipped” reikšme (14).</p>
+<p>Sukuriame naują duomenų masyvą su šiais stulpeliais, surandame jame pasikartojančias eilutes ir tas eilutes pašaliname iš pradinio duomenų masyvo.</p>
 <pre class="r"><code>df2 &lt;- df[,c(7, 9, 10, 12, 14)]
 dup &lt;- which(duplicated(df2), TRUE)
 df &lt;- df[-dup,]</code></pre>
@@ -185,16 +187,24 @@ df &lt;- df[-dup,]</code></pre>
 <div id="duomenu-analize" class="section level3">
 <h3>Duomenų analizė</h3>
 <p>Norėdami surasti, kurie studentai atliko visas užduotis nepraleisdami jokių klausimų, turime iš duomenų lentelės pašalinti tuos studentus, kurie praleido bent vieną klausimą.</p>
+<p>Sukuriame naują masyvą <strong>“df_skipped”</strong>, kuriame yra visi praleisti klausimai ir su funkcija <strong>“unique”</strong> surandame vartotojus, kurie yra tame masyve, t.y. yra praleidę bent vieną klausimą.</p>
 <pre class="r"><code>ind &lt;- with(df, which(skipped ==&quot;TRUE&quot;))
-df_skipped &lt;- df[ind,] #duomenų lentelė su praleistais klausimais
-users &lt;- unique(df_skipped$user) #vartotojai, praleidę bent vieną klausimą
-
-ind &lt;- with(df, which(is.element(df$user, users) ==&quot;TRUE&quot;))
-df_noskip &lt;- df[-ind,] #duomenų lentelė be vartotojų, praleidusių klausimus
-unique(df_noskip$user) #vartotojai, nepraleidę nei vieno klausimo</code></pre>
+df_skipped &lt;- df[ind,]
+users &lt;- unique(df_skipped$user)
+users</code></pre>
+<pre><code>##  [1] &quot;SandraKozlovskaja&quot; &quot;ojautakaite&quot;       &quot;gyse3054&quot;         
+##  [4] &quot;sindeivydas&quot;       &quot;Domante Bulovaite&quot; &quot;rokasaleks&quot;       
+##  [7] &quot;Greta&quot;             &quot;Karolina&quot;          &quot;kestous&quot;          
+## [10] &quot;ogadova&quot;           &quot;Raigardas&quot;         &quot;juste&quot;            
+## [13] &quot;Dariukxas&quot;         &quot;gretajes&quot;          &quot;simonalevickaite&quot;</code></pre>
+<p>Tada pradiniame masyve surandame eilutes, kuriose stulpelyje <strong>“user”</strong> yra šie vartotojai ir sukuriame naują masyvą <strong>“df_noskip”</strong>, kuriame nėra vartotojų praleidusių bent vieną klausimą.</p>
+<pre class="r"><code>ind &lt;- with(df, which(is.element(df$user, users) ==&quot;TRUE&quot;))
+df_noskip &lt;- df[-ind,]
+unique(df_noskip$user)</code></pre>
 <pre><code>## [1] &quot;emru3000&quot;   &quot;simona1234&quot; &quot;Dominykas&quot;  &quot;aipe00&quot;     &quot;MildaPie&quot;  
 ## [6] &quot;zagnyte&quot;    &quot;edba2903&quot;   &quot;Danielius&quot;</code></pre>
-<p>Žinodami, kurie vartotojai yra nepraleidę nei vieno klausimo, galime rasti skaičių pamokų, kurias šie vartotojai yra pilnai atlikę (iš viso buvo 16 pamokų).</p>
+<p>Žinodami, kurie vartotojai yra nepraleidę nei vieno klausimo, galime rasti skaičių pamokų, kurias šie vartotojai yra pilnai atlikę (iš viso buvo <strong>16</strong> pamokų).</p>
+<p>Masyve kiekvienai vartotojo atliktai pamokai paliekame tik vieną eilutę, kad suskaičiavę eilučių su kiekvienu vartotoju skaičių, matytume, kiek pamokų kuris vartotojas atliko.</p>
 <pre class="r"><code>df_noskip &lt;- df_noskip[,c(7, 9)]
 dup &lt;- which(duplicated(df_noskip), TRUE)
 df_noskip &lt;- df_noskip[-dup,]
@@ -204,15 +214,16 @@ table(df_noskip$user)</code></pre>
 ##         16          1          1         11         16         15 
 ## simona1234    zagnyte 
 ##         16         16</code></pre>
-<p>Taigi, visas swirl užduotis pilnai atlikę vartotojai yra <strong>“aipe00”, “emru3000”, “simona1234”</strong> ir <strong>“zagnyte”</strong>.</p>
-<p>Toliau surandame kiek pamokų yra nepilnai atsiskaitę vartotojai, kurie nepraleido nei vieno klausimo:</p>
+<p>Taigi, visas “swirl” užduotis pilnai atlikę vartotojai yra <strong>“aipe00”, “emru3000”, “simona1234”</strong> ir <strong>“zagnyte”</strong>.</p>
+<p>Toliau surandame kiek pamokų yra nepilnai atsiskaitę vartotojai, kurie nepraleido nei vieno klausimo.</p>
+<p>Pašaliname iš duomenų lentelės vartotojus, kurie atlikę visas užduotis ir randame kitų vartotojų <strong>neatsiskaitytų pamokų skaičių</strong>:</p>
 <pre class="r"><code>ind &lt;- with(df_noskip, which(user==&quot;aipe00&quot; | user==&quot;emru3000&quot; | user==&quot;simona1234&quot; | user==&quot;zagnyte&quot;))
 df_noskip &lt;- df_noskip[-ind,]
 16-table(df_noskip$user)</code></pre>
 <pre><code>## 
 ## Danielius Dominykas  edba2903  MildaPie 
 ##        15        15         5         1</code></pre>
-<p>Dabar galime analizuoti vartotojus, praleidusius bent vieną klausimą. Surandame, kiek klausimų kiekvienas iš jų yra praleidęs.</p>
+<p>Dabar galime analizuoti vartotojus, praleidusius bent vieną klausimą. Surandame, <strong>kiek klausimų kiekvienas iš jų yra praleidęs</strong>.</p>
 <pre class="r"><code>table(df_skipped$user)</code></pre>
 <pre><code>## 
 ##         Dariukxas Domante Bulovaite             Greta          gretajes 
@@ -223,16 +234,141 @@ df_noskip &lt;- df_noskip[-ind,]
 ##               131                 8                 9               114 
 ## SandraKozlovskaja  simonalevickaite       sindeivydas 
 ##                16                 5                18</code></pre>
-<p>Ir kiek pamokų nepilnai atsiskaityta:</p>
+<p>Kad surastume kiek pamokų nepilnai atsiskaityta, iš duomenų lentelės su visais praleistais klausimais surandame, kokioje pamokoje, kuris vartotojas yra praleidęs vieną ar kelis klausimus.</p>
+<p>*funkcija <strong>“kable”</strong>, naudojama lentelei atspausdinti yra iš paketo <strong>“knitr”</strong>.</p>
 <pre class="r"><code>df_skipped &lt;- unique(df_skipped[c(&quot;user&quot;, &quot;lesson_name&quot;)])
-#table(df_skipped$user) #kiek yra pamokų su praleistais klausimais
-ind &lt;- with(df, which(is.element(df$user, users) ==&quot;TRUE&quot;))
+kable(head(df_skipped, 10))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">user</th>
+<th align="left">lesson_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1010</td>
+<td align="left">SandraKozlovskaja</td>
+<td align="left">Matrices and Data Frames</td>
+</tr>
+<tr class="even">
+<td align="left">1092</td>
+<td align="left">SandraKozlovskaja</td>
+<td align="left">Functions</td>
+</tr>
+<tr class="odd">
+<td align="left">1651</td>
+<td align="left">SandraKozlovskaja</td>
+<td align="left">lapply and sapply</td>
+</tr>
+<tr class="even">
+<td align="left">1742</td>
+<td align="left">SandraKozlovskaja</td>
+<td align="left">vapply and tapply</td>
+</tr>
+<tr class="odd">
+<td align="left">1901</td>
+<td align="left">SandraKozlovskaja</td>
+<td align="left">Simulation</td>
+</tr>
+<tr class="even">
+<td align="left">2254</td>
+<td align="left">ojautakaite</td>
+<td align="left">Sequences of Numbers</td>
+</tr>
+<tr class="odd">
+<td align="left">2412</td>
+<td align="left">gyse3054</td>
+<td align="left">Matrices and Data Frames</td>
+</tr>
+<tr class="even">
+<td align="left">2465</td>
+<td align="left">gyse3054</td>
+<td align="left">Logic</td>
+</tr>
+<tr class="odd">
+<td align="left">2512</td>
+<td align="left">ojautakaite</td>
+<td align="left">Vectors</td>
+</tr>
+<tr class="even">
+<td align="left">2603</td>
+<td align="left">gyse3054</td>
+<td align="left">Functions</td>
+</tr>
+</tbody>
+</table>
+<p>Tada į duomenų lentelę <strong>“df2”</strong> iš pradinių duomenų atrenkame eilutes su vartotojais, praleidusiais bent vieną klausimą ir lentelėje <strong>“df2”</strong> paliekame tik du stulpelius su visomis šių vartotojų pateiktomis pamokomis.</p>
+<pre class="r"><code>ind &lt;- with(df, which(is.element(df$user, users) ==&quot;TRUE&quot;))
 df2 &lt;- df[ind,]
 df2 &lt;- df2[,c(7, 9)]
 dup &lt;- which(duplicated(df2), TRUE)
-df2 &lt;- df2[-dup,] #visos vartotojų, praleidusių bent vieną klausimą, pateiktos pamokos
-#16 - pamokos, kurias pateikė + pamokos, kurias nepilnai atliko = nepilnai atsiskaitytos pamokos
-16-table(df2$user)+table(df_skipped$user)</code></pre>
+df2 &lt;- df2[-dup,]
+kable(head(df2, 10))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">user</th>
+<th align="left">lesson_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">20</td>
+<td align="left">gyse3054</td>
+<td align="left">Dummy Lesson</td>
+</tr>
+<tr class="even">
+<td align="left">26</td>
+<td align="left">rokasaleks</td>
+<td align="left">Dummy Lesson</td>
+</tr>
+<tr class="odd">
+<td align="left">30</td>
+<td align="left">gyse3054</td>
+<td align="left">Basic Building Blocks</td>
+</tr>
+<tr class="even">
+<td align="left">52</td>
+<td align="left">SandraKozlovskaja</td>
+<td align="left">Dummy Lesson</td>
+</tr>
+<tr class="odd">
+<td align="left">85</td>
+<td align="left">ogadova</td>
+<td align="left">Dummy Lesson</td>
+</tr>
+<tr class="even">
+<td align="left">456</td>
+<td align="left">SandraKozlovskaja</td>
+<td align="left">Basic Building Blocks</td>
+</tr>
+<tr class="odd">
+<td align="left">481</td>
+<td align="left">SandraKozlovskaja</td>
+<td align="left">Workspace and Files</td>
+</tr>
+<tr class="even">
+<td align="left">511</td>
+<td align="left">SandraKozlovskaja</td>
+<td align="left">Sequences of Numbers</td>
+</tr>
+<tr class="odd">
+<td align="left">589</td>
+<td align="left">sindeivydas</td>
+<td align="left">Dummy Lesson</td>
+</tr>
+<tr class="even">
+<td align="left">591</td>
+<td align="left">gyse3054</td>
+<td align="left">Workspace and Files</td>
+</tr>
+</tbody>
+</table>
+<p>Galiausiai iš <strong>16</strong> (t.y. visų pamokų, kurias reikėjo atlikti skaičiaus) atėmę pamokas, kurias šie vartotojai pateikė ir pridėję pamokas, kurias jie nepilnai atliko (praleido bent vieną klausimą), randame <strong>kiek pamokų kiekvienas iš jų yra nepilnai atsiskaitęs</strong>.</p>
+<pre class="r"><code>16-table(df2$user)+table(df_skipped$user)</code></pre>
 <pre><code>## 
 ##         Dariukxas Domante Bulovaite             Greta          gretajes 
 ##                 5                 4                 9                 8 
@@ -252,9 +388,143 @@ df2 &lt;- df2[-dup,] #visos vartotojų, praleidusių bent vieną klausimą, pate
 df2 &lt;- df[,c(7,9)]
 dup &lt;- which(duplicated(df2), TRUE)
 df_time &lt;- df_time[-dup,]
-real_taketime &lt;- round(difftime(df_time$sysTime, df_time$datetime, units=&quot;mins&quot;))
-df_time &lt;- cbind(df_time, real_taketime)</code></pre>
-<p>Pagal vartotojų deklaruojamą laiką galime apskaičiuoti kiek vidutiniškai užtrunka atlikti kiekvieną pamoką:</p>
+kable(head(df_time))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">takeTime</th>
+<th align="left">sysTime</th>
+<th align="left">user</th>
+<th align="left">lesson_name</th>
+<th align="left">datetime</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">18</td>
+<td align="right">1</td>
+<td align="left">2016-09-02 09:45:12</td>
+<td align="left">emru3000</td>
+<td align="left">Dummy Lesson</td>
+<td align="left">2016-09-02 09:44:30</td>
+</tr>
+<tr class="even">
+<td align="left">20</td>
+<td align="right">1</td>
+<td align="left">2016-09-02 09:45:35</td>
+<td align="left">gyse3054</td>
+<td align="left">Dummy Lesson</td>
+<td align="left">2016-09-02 09:45:21</td>
+</tr>
+<tr class="odd">
+<td align="left">24</td>
+<td align="right">1</td>
+<td align="left">2016-09-02 09:49:38</td>
+<td align="left">simona1234</td>
+<td align="left">Dummy Lesson</td>
+<td align="left">2016-09-02 09:49:03</td>
+</tr>
+<tr class="even">
+<td align="left">26</td>
+<td align="right">2</td>
+<td align="left">2016-09-02 09:49:45</td>
+<td align="left">rokasaleks</td>
+<td align="left">Dummy Lesson</td>
+<td align="left">2016-09-02 09:49:03</td>
+</tr>
+<tr class="odd">
+<td align="left">28</td>
+<td align="right">1</td>
+<td align="left">2016-09-02 09:50:25</td>
+<td align="left">Dominykas</td>
+<td align="left">Dummy Lesson</td>
+<td align="left">2016-09-02 09:49:25</td>
+</tr>
+<tr class="even">
+<td align="left">30</td>
+<td align="right">4</td>
+<td align="left">2016-09-02 09:54:28</td>
+<td align="left">gyse3054</td>
+<td align="left">Basic Building Blocks</td>
+<td align="left">2016-09-02 09:49:05</td>
+</tr>
+</tbody>
+</table>
+<p>Tada iš stulpelio <strong>“sysTime”</strong> atėmę stulpelio <strong>“datetime”</strong> reikšmes, gauname laiką, kurį iš tikrųjų užtruko kiekvienas vartotojas atlikti užduočiai. Stulpelį su šiomis reikšmėmis prijungiame prie duomenų lentelės.</p>
+<pre class="r"><code>real_taketime &lt;- round(difftime(df_time$sysTime, df_time$datetime, units=&quot;mins&quot;))
+df_time &lt;- cbind(df_time, real_taketime)
+kable(head(df_time))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">takeTime</th>
+<th align="left">sysTime</th>
+<th align="left">user</th>
+<th align="left">lesson_name</th>
+<th align="left">datetime</th>
+<th align="left">real_taketime</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">18</td>
+<td align="right">1</td>
+<td align="left">2016-09-02 09:45:12</td>
+<td align="left">emru3000</td>
+<td align="left">Dummy Lesson</td>
+<td align="left">2016-09-02 09:44:30</td>
+<td align="left">1 mins</td>
+</tr>
+<tr class="even">
+<td align="left">20</td>
+<td align="right">1</td>
+<td align="left">2016-09-02 09:45:35</td>
+<td align="left">gyse3054</td>
+<td align="left">Dummy Lesson</td>
+<td align="left">2016-09-02 09:45:21</td>
+<td align="left">0 mins</td>
+</tr>
+<tr class="odd">
+<td align="left">24</td>
+<td align="right">1</td>
+<td align="left">2016-09-02 09:49:38</td>
+<td align="left">simona1234</td>
+<td align="left">Dummy Lesson</td>
+<td align="left">2016-09-02 09:49:03</td>
+<td align="left">1 mins</td>
+</tr>
+<tr class="even">
+<td align="left">26</td>
+<td align="right">2</td>
+<td align="left">2016-09-02 09:49:45</td>
+<td align="left">rokasaleks</td>
+<td align="left">Dummy Lesson</td>
+<td align="left">2016-09-02 09:49:03</td>
+<td align="left">1 mins</td>
+</tr>
+<tr class="odd">
+<td align="left">28</td>
+<td align="right">1</td>
+<td align="left">2016-09-02 09:50:25</td>
+<td align="left">Dominykas</td>
+<td align="left">Dummy Lesson</td>
+<td align="left">2016-09-02 09:49:25</td>
+<td align="left">1 mins</td>
+</tr>
+<tr class="even">
+<td align="left">30</td>
+<td align="right">4</td>
+<td align="left">2016-09-02 09:54:28</td>
+<td align="left">gyse3054</td>
+<td align="left">Basic Building Blocks</td>
+<td align="left">2016-09-02 09:49:05</td>
+<td align="left">5 mins</td>
+</tr>
+</tbody>
+</table>
+<p>Pagal vartotojų deklaruojamą laiką galime apskaičiuoti, kiek vidutiniškai užtrunka atlikti kiekvieną pamoką:</p>
 <pre class="r"><code>lessons &lt;- split(df_time, f=df_time$lesson_name)
 time_decl &lt;- sapply(lessons, function(x) round(mean(x$takeTime), 2))
 sort(time_decl)</code></pre>
@@ -270,7 +540,7 @@ sort(time_decl)</code></pre>
 ##                    19.52                    22.16                    22.47 
 ##                Functions 
 ##                    30.94</code></pre>
-<p>Tą patį galime apskaičiuoti ir pagal realų laiką, kurį kiekvienai pamokai atlikti užtruko studentai. Tačiau tam pirmiausia reikia pašalinti eilutes, kuriose atlikimo laikas yra daugiau kaip 60 minučių, kadangi tikėtina, jog tą pamoką studentas atliko per kelis kartus ir šis laikas nėra tikslus.</p>
+<p>Tą patį galime apskaičiuoti ir pagal realų laiką, kurį kiekvienai pamokai atlikti užtruko studentai. Tačiau tam pirmiausia reikia pašalinti eilutes, kuriose atlikimo laikas yra daugiau kaip <strong>60</strong> minučių, kadangi tikėtina, jog tą pamoką studentas atliko per kelis kartus ir šis laikas nėra tikslus.</p>
 <pre class="r"><code>ind &lt;- with(df_time, which(df_time$real_taketime&gt;60))
 df_time &lt;- df_time[-ind, ]
 lessons &lt;- split(df_time, f=df_time$lesson_name)
@@ -293,11 +563,11 @@ sort(time_taken)</code></pre>
 <div id="ar-galima-pasitiketi-zmoniu-deklaruojamu-laiku" class="section level4">
 <h4>Ar galima pasitikėti žmonių deklaruojamu laiku?</h4>
 <p>Atsakyti į šį klausimą galima ir remiantis ankstesnio klausimo rezultatais (matyti, kad vidutiniai laikai labai panašūs).</p>
-<p>Tačiau tą galime patikrinti ir apskaičiavę skirtumą tarp žmogaus deklaruoto ir sistemos fiksuoto laiko:</p>
+<p>Tačiau tą galime patikrinti ir apskaičiavę vidutinį skirtumą tarp žmonių deklaruoto ir sistemos fiksuoto laiko:</p>
 <pre class="r"><code>timedif &lt;- abs(df_time$takeTime - df_time$real_taketime)
 mean(timedif)</code></pre>
 <pre><code>## Time difference of 7.077441 mins</code></pre>
-<p>Matome, kad vidutiniškai skirtumas yra tik 7 minutės, todėl galima teigti, jog žmonių deklaruojamu laiku galima pasitikėti.</p>
+<p>Matome, kad vidutiniškai skirtumas yra tik <strong>7</strong> minutės, todėl galima teigti, jog žmonių deklaruojamu laiku galima pasitikėti.</p>
 </div>
 <div id="kurios-uzduotys-sunkiausios" class="section level4">
 <h4>Kurios užduotys sunkiausios?</h4>
@@ -325,7 +595,7 @@ head(sort(table(df2$lesson_name), decreasing=TRUE))</code></pre>
 ##                      222                      169                      142 
 ## Matrices and Data Frames      Workspace and Files                  Vectors 
 ##                      129                      106                       98</code></pre>
-<p>Galima teigti, jog sunkiausios pamokos buvo <strong>“Functions”</strong> ir <strong>“Workspace and Files”</strong>.</p>
+<p>Galima teigti, jog sunkiausios pamokos buvo <strong>“Functions”</strong> ir <strong>“Workspace and Files”</strong>, kadangi tiek pagal laiką, tiek pagal praleistų klausimų ir klaidingų bandymų skaičių, šios pamokos yra tarp 6 sudėtingiausių pamokų.</p>
 </div>
 </div>
 </div>

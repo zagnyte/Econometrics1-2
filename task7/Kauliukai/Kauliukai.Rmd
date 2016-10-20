@@ -12,31 +12,28 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Du žaidėjai žaidžia tokį žaidimą. Pirmasis žaidėjas meta tris kauliukus ir fiksuoja iškritusių taškų sumą. Antrasis žaidėjas ridena du kauliukus ir skaičiuoja iškritusių taškų sumą. Laimi tas žaidėjas, kurio taškų suma yra didesnė. Jeigu taškų sumos yra lygios, tai eksperimentas kartojamas iš naujo (ir taip kartojama tol, kol galiausiai nustatomas laimėtojas).
 
-Kokia tikimybė laimėti pirmajam žaidėjui?
+**Kokia tikimybė laimėti pirmajam žaidėjui?**
+
+Sugeneruojame 100000 pirmojo ir antrojo žaidėjų kauliukų ridenimų ir suskaičiuojame kiek kartų laimėjo pirmasis žaidėjas.
 
 ```{r}
 n <- 100000
-i <- 1
 
-zaid_1 <- c(rep(0, times=n))
-zaid_2 <- c(rep(0, times=n))
-laim_1 <- c(rep(0, times=n))
+zaid_1 <- replicate(n, sum(sample(1:6, 3, replace=TRUE)))
+zaid_2 <- replicate(n, sum(sample(1:6, 2, replace=TRUE)))
 
-while (i<n+1) {
-  zaid_1[i] <- sum(sample(1:6, 3, replace=TRUE))
-  zaid_2[i] <- sum(sample(1:6, 2, replace=TRUE))
-  if (zaid_1[i] > zaid_2[i]) {
-    laim_1[i] <- 1
-    i = i+1
-  }
-  else if (zaid_1[i] < zaid_2[i]) {
-    laim_1[i] <- 0
-    i = i+1
-  }
-  else {
-    i = i
-  }
-}
+sum(zaid_1 > zaid_2)
+```
 
-mean(laim_1)
+Kadangi iškritus lygioms taškų sumoms, bandymas yra kartojamas, tai iš 100000 (visų bandymų) reikia atimti bandymus, kai abiems žaidėjams iškrito lygus taškų skaičius.
+
+```{r}
+m <- n - sum(zaid_1 == zaid_2)
+m
+```
+
+Toliau surandame tikimybę laimėti pirmajam žaidėjui:
+
+```{r}
+sum(zaid_1 > zaid_2)/m
 ```

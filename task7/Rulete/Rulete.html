@@ -124,25 +124,16 @@ $(document).ready(function () {
 <div id="rulete" class="section level2">
 <h2>Rulete</h2>
 <p>Nagrinėkime standartinę kazino ruletę.</p>
-<p>Kokia tikimybė, kad po 1000 vienodų statymų ant vienos pasirinktos spalvos, bus teigiamas balansas?</p>
+<p><strong>Kokia tikimybė, kad po 1000 vienodų statymų ant vienos pasirinktos spalvos, bus teigiamas balansas?</strong></p>
+<p>Sugeneruojame 100000 tokių bandymų ir suskaičiuojame tikimybę, kad balansas bus teigiamas.</p>
 <pre class="r"><code>n &lt;- 100000
 
-bal &lt;- c(rep(0, times=n))
-teig_bal &lt;- c(rep(0, times=n))
+bal &lt;- replicate(n, sum(sample(c(1,-1), size=1000, replace=TRUE, prob=c(18/37, 19/37))))
 
-for (i in 1:n) {
-  bal[i] &lt;- sum(sample(c(1,-1), size=1000, replace=TRUE, prob=c(18/37, 19/37)))
-  if (bal[i] &gt; 0) {
-    teig_bal[i] &lt;- 1
-  }
-  else {
-    teig_bal[i] &lt;- 0
-  }
-}
-
-mean(teig_bal)</code></pre>
-<pre><code>## [1] 0.18737</code></pre>
-<p>Raskite apytikslę x reikšmę, kuriai galioja nelygybė P(balansas&lt;x)=0.25.</p>
+mean(bal&gt;0)</code></pre>
+<pre><code>## [1] 0.18741</code></pre>
+<p><strong>Raskite apytikslę x reikšmę, kuriai galioja nelygybė P(balansas&lt;x)=0.25.</strong></p>
+<p>Tam reikia surasti 25% kvantilį.</p>
 <pre class="r"><code>x &lt;- quantile(bal, probs=0.25)
 x</code></pre>
 <pre><code>## 25% 

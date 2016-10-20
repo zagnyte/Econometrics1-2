@@ -1,5 +1,5 @@
 ---
-title: "task3.Rmd"
+title: "Task 3"
 author: "Simona Gritytė"
 output: html_document
 ---

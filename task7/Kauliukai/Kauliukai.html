@@ -124,32 +124,22 @@ $(document).ready(function () {
 <div id="kauliukai" class="section level2">
 <h2>Kauliukai</h2>
 <p>Du žaidėjai žaidžia tokį žaidimą. Pirmasis žaidėjas meta tris kauliukus ir fiksuoja iškritusių taškų sumą. Antrasis žaidėjas ridena du kauliukus ir skaičiuoja iškritusių taškų sumą. Laimi tas žaidėjas, kurio taškų suma yra didesnė. Jeigu taškų sumos yra lygios, tai eksperimentas kartojamas iš naujo (ir taip kartojama tol, kol galiausiai nustatomas laimėtojas).</p>
-<p>Kokia tikimybė laimėti pirmajam žaidėjui?</p>
+<p><strong>Kokia tikimybė laimėti pirmajam žaidėjui?</strong></p>
+<p>Sugeneruojame 100000 pirmojo ir antrojo žaidėjų kauliukų ridenimų ir suskaičiuojame kiek kartų laimėjo pirmasis žaidėjas.</p>
 <pre class="r"><code>n &lt;- 100000
-i &lt;- 1
 
-zaid_1 &lt;- c(rep(0, times=n))
-zaid_2 &lt;- c(rep(0, times=n))
-laim_1 &lt;- c(rep(0, times=n))
+zaid_1 &lt;- replicate(n, sum(sample(1:6, 3, replace=TRUE)))
+zaid_2 &lt;- replicate(n, sum(sample(1:6, 2, replace=TRUE)))
 
-while (i&lt;n+1) {
-  zaid_1[i] &lt;- sum(sample(1:6, 3, replace=TRUE))
-  zaid_2[i] &lt;- sum(sample(1:6, 2, replace=TRUE))
-  if (zaid_1[i] &gt; zaid_2[i]) {
-    laim_1[i] &lt;- 1
-    i = i+1
-  }
-  else if (zaid_1[i] &lt; zaid_2[i]) {
-    laim_1[i] &lt;- 0
-    i = i+1
-  }
-  else {
-    i = i
-  }
-}
-
-mean(laim_1)</code></pre>
-<pre><code>## [1] 0.8364</code></pre>
+sum(zaid_1 &gt; zaid_2)</code></pre>
+<pre><code>## [1] 77500</code></pre>
+<p>Kadangi iškritus lygioms taškų sumoms, bandymas yra kartojamas, tai iš 100000 (visų bandymų) reikia atimti bandymus, kai abiems žaidėjams iškrito lygus taškų skaičius.</p>
+<pre class="r"><code>m &lt;- n - sum(zaid_1 == zaid_2)
+m</code></pre>
+<pre><code>## [1] 92962</code></pre>
+<p>Toliau surandame tikimybę laimėti pirmajam žaidėjui:</p>
+<pre class="r"><code>sum(zaid_1 &gt; zaid_2)/m</code></pre>
+<pre><code>## [1] 0.833674</code></pre>
 </div>
 
 

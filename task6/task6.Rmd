@@ -6,7 +6,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library('chron')
+library("knitr")
 ```
 
 ## Swirl rezultatai
@@ -30,6 +30,11 @@ Pažvelgę į nuskaitytus duomenis, matome, jog ne visos eilutės mums reikaling
 
 ```{r}
 unique(df$user)
+```
+
+Taigi, surandame eilutes, kuriose stulpelyje "user" yra šie vardai ir jas pašaliname.
+
+```{r}
 ind <- with(df, which(user=="aaa" | user=="testas" | user=="1vbutkus"))
 df <- df[-ind,]
 unique(df$user)
@@ -44,7 +49,9 @@ df$user[df$user=="Juste" | df$user=="ju" | df$user=="j"] <- "juste"
 unique(df$user)
 ```
 
-Dabar, kai besidubliuojančių vartotojų nebėra, patikriname, ar nėra pakartotinai to paties vartotojo suvestų pamokų ir pašaliname besidubliuojančias eilutes. Tam reikia tikrinti tik stulpelius su vartotojo vardu, pamokos pavadinimu, klausimo numeriu, bandymo numeriu ir "skipped" reikšme.
+Dabar, kai besidubliuojančių vartotojų nebėra, patikriname, ar nėra pakartotinai to paties vartotojo suvestų pamokų ir pašaliname besidubliuojančias eilutes. Tam reikia tikrinti tik stulpelius su vartotojo vardu (7), pamokos pavadinimu (9), klausimo numeriu (10), bandymo numeriu (12) ir "skipped" reikšme (14).
+
+Sukuriame naują duomenų masyvą su šiais stulpeliais, surandame jame pasikartojančias eilutes ir tas eilutes pašaliname iš pradinio duomenų masyvo.
 
 ```{r}
 df2 <- df[,c(7, 9, 10, 12, 14)]
@@ -56,17 +63,26 @@ df <- df[-dup,]
 
 Norėdami surasti, kurie studentai atliko visas užduotis nepraleisdami jokių klausimų, turime iš duomenų lentelės pašalinti tuos studentus, kurie praleido bent vieną klausimą.
 
+Sukuriame naują masyvą **"df_skipped"**, kuriame yra visi praleisti klausimai ir su funkcija **"unique"** surandame vartotojus, kurie yra tame masyve, t.y. yra praleidę bent vieną klausimą.
+
 ```{r}
 ind <- with(df, which(skipped =="TRUE"))
-df_skipped <- df[ind,] #duomenų lentelė su praleistais klausimais
-users <- unique(df_skipped$user) #vartotojai, praleidę bent vieną klausimą
-
-ind <- with(df, which(is.element(df$user, users) =="TRUE"))
-df_noskip <- df[-ind,] #duomenų lentelė be vartotojų, praleidusių klausimus
-unique(df_noskip$user) #vartotojai, nepraleidę nei vieno klausimo
+df_skipped <- df[ind,]
+users <- unique(df_skipped$user)
+users
 ```
 
-Žinodami, kurie vartotojai yra nepraleidę nei vieno klausimo, galime rasti skaičių pamokų, kurias šie vartotojai yra pilnai atlikę (iš viso buvo 16 pamokų).
+Tada pradiniame masyve surandame eilutes, kuriose stulpelyje **"user"** yra šie vartotojai ir sukuriame naują masyvą **"df_noskip"**, kuriame nėra vartotojų praleidusių bent vieną klausimą.
+
+```{r}
+ind <- with(df, which(is.element(df$user, users) =="TRUE"))
+df_noskip <- df[-ind,]
+unique(df_noskip$user)
+```
+
+Žinodami, kurie vartotojai yra nepraleidę nei vieno klausimo, galime rasti skaičių pamokų, kurias šie vartotojai yra pilnai atlikę (iš viso buvo **16** pamokų).
+
+Masyve kiekvienai vartotojo atliktai pamokai paliekame tik vieną eilutę, kad suskaičiavę eilučių su kiekvienu vartotoju skaičių, matytume, kiek pamokų kuris vartotojas atliko.
 
 ```{r}
 df_noskip <- df_noskip[,c(7, 9)]
@@ -75,9 +91,11 @@ df_noskip <- df_noskip[-dup,]
 table(df_noskip$user)
 ```
 
-Taigi, visas swirl užduotis pilnai atlikę vartotojai yra **"aipe00", "emru3000", "simona1234"** ir **"zagnyte"**.
+Taigi, visas "swirl" užduotis pilnai atlikę vartotojai yra **"aipe00", "emru3000", "simona1234"** ir **"zagnyte"**.
 
-Toliau surandame kiek pamokų yra nepilnai atsiskaitę vartotojai, kurie nepraleido nei vieno klausimo:
+Toliau surandame kiek pamokų yra nepilnai atsiskaitę vartotojai, kurie nepraleido nei vieno klausimo.
+
+Pašaliname iš duomenų lentelės vartotojus, kurie atlikę visas užduotis ir randame kitų vartotojų **neatsiskaitytų pamokų skaičių**:
 
 ```{r}
 ind <- with(df_noskip, which(user=="aipe00" | user=="emru3000" | user=="simona1234" | user=="zagnyte"))
@@ -85,23 +103,35 @@ df_noskip <- df_noskip[-ind,]
 16-table(df_noskip$user)
 ```
 
-Dabar galime analizuoti vartotojus, praleidusius bent vieną klausimą. Surandame, kiek klausimų kiekvienas iš jų yra praleidęs.
+Dabar galime analizuoti vartotojus, praleidusius bent vieną klausimą. Surandame, **kiek klausimų kiekvienas iš jų yra praleidęs**.
 
 ```{r}
 table(df_skipped$user)
 ```
 
-Ir kiek pamokų nepilnai atsiskaityta:
+Kad surastume kiek pamokų nepilnai atsiskaityta, iš duomenų lentelės su visais praleistais klausimais surandame, kokioje pamokoje, kuris vartotojas yra praleidęs vieną ar kelis klausimus.
+
+ *funkcija __"kable"__, naudojama lentelei atspausdinti yra iš paketo __"knitr"__.
 
 ```{r}
 df_skipped <- unique(df_skipped[c("user", "lesson_name")])
-#table(df_skipped$user) #kiek yra pamokų su praleistais klausimais
+kable(head(df_skipped, 10))
+```
+
+Tada į duomenų lentelę **"df2"** iš pradinių duomenų atrenkame eilutes su vartotojais, praleidusiais bent vieną klausimą ir lentelėje **"df2"** paliekame tik du stulpelius su visomis šių vartotojų pateiktomis pamokomis.
+
+```{r}
 ind <- with(df, which(is.element(df$user, users) =="TRUE"))
 df2 <- df[ind,]
 df2 <- df2[,c(7, 9)]
 dup <- which(duplicated(df2), TRUE)
-df2 <- df2[-dup,] #visos vartotojų, praleidusių bent vieną klausimą, pateiktos pamokos
-#16 - pamokos, kurias pateikė + pamokos, kurias nepilnai atliko = nepilnai atsiskaitytos pamokos
+df2 <- df2[-dup,]
+kable(head(df2, 10))
+```
+
+Galiausiai iš **16** (t.y. visų pamokų, kurias reikėjo atlikti skaičiaus) atėmę pamokas, kurias šie vartotojai pateikė ir pridėję pamokas, kurias jie nepilnai atliko (praleido bent vieną klausimą), randame **kiek pamokų kiekvienas iš jų yra nepilnai atsiskaitęs**.
+
+```{r}
 16-table(df2$user)+table(df_skipped$user)
 ```
 
@@ -116,11 +146,18 @@ df_time <- df[,c(3, 6, 7, 9, 13)]
 df2 <- df[,c(7,9)]
 dup <- which(duplicated(df2), TRUE)
 df_time <- df_time[-dup,]
-real_taketime <- round(difftime(df_time$sysTime, df_time$datetime, units="mins"))
-df_time <- cbind(df_time, real_taketime)
+kable(head(df_time))
 ```
 
-Pagal vartotojų deklaruojamą laiką galime apskaičiuoti kiek vidutiniškai užtrunka atlikti kiekvieną pamoką:
+Tada iš stulpelio **"sysTime"** atėmę stulpelio **"datetime"** reikšmes, gauname laiką, kurį iš tikrųjų užtruko kiekvienas vartotojas atlikti užduočiai. Stulpelį su šiomis reikšmėmis prijungiame prie duomenų lentelės.
+
+```{r}
+real_taketime <- round(difftime(df_time$sysTime, df_time$datetime, units="mins"))
+df_time <- cbind(df_time, real_taketime)
+kable(head(df_time))
+```
+
+Pagal vartotojų deklaruojamą laiką galime apskaičiuoti, kiek vidutiniškai užtrunka atlikti kiekvieną pamoką:
 
 ```{r}
 lessons <- split(df_time, f=df_time$lesson_name)
@@ -128,7 +165,7 @@ time_decl <- sapply(lessons, function(x) round(mean(x$takeTime), 2))
 sort(time_decl)
 ```
 
-Tą patį galime apskaičiuoti ir pagal realų laiką, kurį kiekvienai pamokai atlikti užtruko studentai. Tačiau tam pirmiausia reikia pašalinti eilutes, kuriose atlikimo laikas yra daugiau kaip 60 minučių, kadangi tikėtina, jog tą pamoką studentas atliko per kelis kartus ir šis laikas nėra tikslus.
+Tą patį galime apskaičiuoti ir pagal realų laiką, kurį kiekvienai pamokai atlikti užtruko studentai. Tačiau tam pirmiausia reikia pašalinti eilutes, kuriose atlikimo laikas yra daugiau kaip **60** minučių, kadangi tikėtina, jog tą pamoką studentas atliko per kelis kartus ir šis laikas nėra tikslus.
 
 ```{r}
 ind <- with(df_time, which(df_time$real_taketime>60))
@@ -144,14 +181,14 @@ Galime pastebėti, jog studentų deklaruotas vidutinis laikas yra šiek tiek did
 
 Atsakyti į šį klausimą galima ir remiantis ankstesnio klausimo rezultatais (matyti, kad vidutiniai laikai labai panašūs).
 
-Tačiau tą galime patikrinti ir apskaičiavę skirtumą tarp žmogaus deklaruoto ir sistemos fiksuoto laiko:
+Tačiau tą galime patikrinti ir apskaičiavę vidutinį skirtumą tarp žmonių deklaruoto ir sistemos fiksuoto laiko:
 
 ```{r}
 timedif <- abs(df_time$takeTime - df_time$real_taketime)
 mean(timedif)
 ```
 
-Matome, kad vidutiniškai skirtumas yra tik 7 minutės, todėl galima teigti, jog žmonių deklaruojamu laiku galima pasitikėti.
+Matome, kad vidutiniškai skirtumas yra tik **7** minutės, todėl galima teigti, jog žmonių deklaruojamu laiku galima pasitikėti.
 
 #### Kurios užduotys sunkiausios?
 
@@ -177,4 +214,4 @@ df2 <- df[ind,] #neteisingi atsakymai
 head(sort(table(df2$lesson_name), decreasing=TRUE))
 ```
 
-Galima teigti, jog sunkiausios pamokos buvo **"Functions"** ir **"Workspace and Files"**.
+Galima teigti, jog sunkiausios pamokos buvo **"Functions"** ir **"Workspace and Files"**, kadangi tiek pagal laiką, tiek pagal praleistų klausimų ir klaidingų bandymų skaičių, šios pamokos yra tarp 6 sudėtingiausių pamokų.

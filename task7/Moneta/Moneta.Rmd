@@ -12,43 +12,33 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Tarkime metama moneta. Jeigu iškrenta herbas, tai laimite 12 EUR. Jeigu skaičius, tai pralošiate 10 EUR. Bus žaidžiama 100 kartų ir gauti rezultatai sumuojami.
 
-Kokia tikimybė jums turėti teigiamą balansą po 100 kartų?
+**Kokia tikimybė jums turėti teigiamą balansą po 100 kartų?**
+
+Sugeneruojame 100000 monetos metimų po 100 kartų ir skaičiuojame vidurkį, kiek kartų balansas buvo teigiamas.
 
 ```{r}
 n <- 100000
-
-bal <- c(rep(0, times=n))
-teig_bal <- c(rep(0, times=n))
-
-for (i in 1:n) {
-  bal[i] <- sum(sample(c(12, -10), 100, replace=TRUE))
-  if (bal[i] > 0) {
-    teig_bal[i] <- 1
-  }
-  else {
-    teig_bal[i] <- 0
-  }
-}
-
-mean(teig_bal)
+bal <- replicate(n, sum(sample(c(12, -10), 100, replace=TRUE)))
+mean(bal>0)
 ```
 
-Koks balanso pasikliautinis 95 intervalas?
+**Koks balanso pasikliautinis 95 intervalas?**
 
 Apatinis pasikliautinojo intervalo rėžis:
 
 ```{r}
-mean(bal) - qt(0.975, df=n-1)*(sd(bal)/sqrt(n))
+quantile(bal, 0.025)
 ```
 
 Viršutinis pasikliautinojo intervalo rėžis:
 
 ```{r}
-mean(bal) + qt(0.975, df=n-1)*(sd(bal)/sqrt(n))
+quantile(bal, 0.975)
 ```
 
-Kaip atrodo balanso tankis?
+**Kaip atrodo balanso tankis?**
 
 ```{r}
 plot(density(bal), main="Balanso tankis")
+grid()
 ```

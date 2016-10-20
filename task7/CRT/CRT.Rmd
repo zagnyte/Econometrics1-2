@@ -12,7 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Generuojame n atsitiktinių dydžių turinčių Beta skirstinį su parametrais α=β=0.5. Iš šių atsitiktinių dydžių suskaičiuojamas aritmetinis vidurkis.
 
-Kaip atrodo aritmetinio vidurkio tankis, kai n=100?
+**Kaip atrodo aritmetinio vidurkio tankis, kai n=100?**
+
+Sugeneruojame imtį, kurią sudaro 100000 aritmetinių vidurkių ir pavaizduojame šios imties tankį.
 
 ```{r}
 n <- 100
@@ -21,5 +23,6 @@ m <- 100000
 vid <- replicate(m, mean(rbeta(n, 0.5, 0.5)))
 
 plot(density(vid), main="Aritmetinio vidurkio tankis")
+grid()
 ```
 
