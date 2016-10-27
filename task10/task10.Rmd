@@ -1,0 +1,45 @@
+---
+title: "Task 10"
+author: "Simona Gritytė"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Task 10
+
+**a. Tegul x1,...,X100∼N(1,2). Susigeneruokite tokią imtį ir patikrinkite nulinę hipotezę, kad H0:μ=1, su alternatyva, kad μ≠1. Tam rekalinga funkcija t.test. Detaliai paaiškinkite ką reiškia funkcijos išvestyje pateikti skaičiai.**
+
+Susigeneruojame imtį ir su funkcija t.test patikriname, ar jos tikrasis vidurkis lygus 1.
+
+```{r, include=FALSE}
+set.seed(2016)
+```
+
+```{r}
+x <- rnorm(100, mean=1, sd=sqrt(2))
+t.test(x, mu=1)
+``` 
+
+Funkcijos **t.test** išvestyje pateikiama p reikšmė **p-value** (tikimybė, kad atmesime teisingą nulinę hipotezę) leidžia spręsti, ar nulinė hipotezė atmetama, ar ne. Kadangi hipotezę tikriname su reikšmingumo lygmeniu 0,05, tai nulinę hipotezę atmetame, jei p-value < 0,05. Šiuo atveju nulinė hipotezė μ=1 **neatmetama**.
+
+Hipotezę galima tikrinti ir atsižvelgiant į funkcijos **t.test** išvestyje pateikiamą 95% pasikliautinumo intervalą (**95 percent confidence interval**). Jei į šį intervalą patenka reikšmė μ=1, tai nulinė hipotezė **neatmetama**.
+
+**b. Kartokite a) dalies generavima daug kartų (pvz.10^4) ir suskaičiuokite kiek atvejų buvo atmesta nulinė hipotezė? Išreiškite šį skaičių procentais. Kokią išvadą galite padaryti?**
+
+Sukuriame funkciją, kuri sugeneruoja imtį ir patikrina hipotezę, kad H0:μ=1, su alternatyva, kad μ≠1. Paleidžiame šią funkciją 10^4 kartų ir suskaičiuojame, kiek kartų buvo atmesta nulinė hipotezė. 
+
+```{r}
+generate <- function() {
+  x <- rnorm(100, mean=1, sd=sqrt(2))
+  ttest <- t.test(x, mu=1)
+  return(ttest$p.value < 0.05)
+}
+
+y <- replicate(10^4, generate())
+mean(y)
+```
+
+Matome, kad apytiksliai 5% atvejų nulinė hipotezė buvo atmesta, nors ji ir buvo teisinga (žinome, kad generavome imtį, kurios vidurkis μ lygus 1). To ir buvo galima tikėtis, kadangi hipotezę tikrinome su reikšmingumo lygmeniu 0,05, t.y. tikimybė atmesti teisingą nulinę hipotezę buvo 0,05.
