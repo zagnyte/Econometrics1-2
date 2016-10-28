@@ -16,7 +16,7 @@ And why would anyone want to do this? Well, maybe you’re a writer and you want
 
 The data that I will be using is a sample of 1000 reviews of popular free-to-play games from the iTunes store. You can download the data [here](http://www.deltadna.com/wp-content/uploads/2015/04/Reviews.csv).
 
-Firstly, we need to install the "tm" and "wordcloud" libraries that we will be using for our text analysis and set our working directory to where we saved our CSV file.
+Firstly, we need to install the **"tm"**, **"wordcloud"** and **"RColorBrewer"** libraries that we will be using for our text analysis and set our working directory to where we saved our CSV file.
 
 ```{r, include=FALSE}
 library('tm')
